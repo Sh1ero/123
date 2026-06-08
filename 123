@@ -1,0 +1,415 @@
+<?php
+$servername = "localhost";
+$username = "web1";
+$password = "P@ssw0rd";
+$dbname = "web";
+
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+?> 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GAME HUB | DOTA  PUBG  CS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #0f0c29, #1a1a2e, #16213e);
+            color: #fff;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 48px;
+            margin-bottom: 10px;
+            letter-spacing: 3px;
+        }
+
+        .sub {
+            text-align: center;
+            opacity: 0.7;
+            margin-bottom: 40px;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            padding: 12px 32px;
+            font-size: 20px;
+            font-weight: bold;
+            color: white;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .tab-btn:hover {
+            background: rgba(255,255,255,0.25);
+            transform: scale(1.02);
+        }
+
+        .tab-btn.active {
+            background: #ff6600;
+            box-shadow: 0 0 15px rgba(255,102,0,0.5);
+        }
+
+        .tab-content {
+            display: none;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
+            padding: 40px;
+            border: 1px solid rgba(255,102,0,0.3);
+            animation: fade 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fade {
+            from { opacity: 0; transform: translateY(10px);}
+            to { opacity: 1; transform: translateY(0);}
+        }
+
+        .hero-grid {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+
+        .hero-card {
+            text-align: center;
+            width: 250px;
+            cursor: pointer;
+        }
+
+        .hero-img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 20px;
+            border: 3px solid #ff6600;
+            transition: transform 0.3s, box-shadow 0.3s;
+            background: #1a1a2e;
+        }
+
+        .hero-img:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 25px rgba(255,102,0,0.5);
+        }
+
+        .hero-name {
+            margin-top: 15px;
+            font-size: 22px;
+            font-weight: bold;
+            color: #ffaa00;
+        }
+
+        .hero-desc {
+            font-size: 12px;
+            opacity: 0.7;
+            margin-top: 5px;
+        }
+
+        .game-title {
+            text-align: center;
+            font-size: 32px;
+            margin-bottom: 30px;
+            color: #ffaa00;
+        }
+
+        .ranking {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+
+        .rank-card {
+            text-align: center;
+            width: 250px;
+            background: rgba(0,0,0,0.5);
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid #ff6600;
+        }
+
+        .rank-card.place1 {
+            border: 2px solid gold;
+            box-shadow: 0 0 20px rgba(255,215,0,0.3);
+        }
+
+        .rank-card.place2 {
+            border: 2px solid silver;
+        }
+
+        .rank-card.place3 {
+            border: 2px solid #cd7f32;
+        }
+
+        .rank-medal {
+            font-size: 48px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .rank-face {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 3px solid #ff6600;
+            margin: 15px auto;
+            display: block;
+            background: #1a1a2e;
+        }
+
+        .rank-name {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .rank-damage {
+            font-size: 18px;
+            color: #ffaa00;
+            font-family: monospace;
+        }
+
+        .cs-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .cs-table th, .cs-table td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .cs-table th {
+            background: rgba(255,102,0,0.3);
+            color: #ffaa00;
+        }
+
+        .cs-table tr:hover {
+            background: rgba(255,255,255,0.05);
+        }
+
+        .negative {
+            color: #ff6666;
+            font-weight: bold;
+        }
+
+        .cs-face {
+            width: 40px;
+            height: 40px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 1px solid #ff6600;
+            vertical-align: middle;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            font-size: 12px;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>GAME HUB</h1>
+    <div class="sub">DOTA 2  PUBG  COUNTER-STRIKE</div>
+
+    <div class="tabs">
+        <button class="tab-btn active" data-tab="dota">DOTA 2</button>
+        <button class="tab-btn" data-tab="pubg">PUBG</button>
+        <button class="tab-btn" data-tab="cs">CS:GO</button>
+    </div>
+
+    <!-- DOTA TAB -->
+    <div id="dota" class="tab-content active">
+        <div class="game-title">DOTA 2 HEROES</div>
+        <div class="hero-grid">
+            <div class="hero-card">
+                <img class="hero-img" id="sf-img" src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/nevermore.png">
+                <div class="hero-name">SHADOW FIEND</div>
+                <div class="hero-desc">Nevermore  Requiem of Souls</div>
+            </div>
+            <div class="hero-card">
+                <img class="hero-img" id="axe-img" src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/axe.png" alt="Axe">
+                <div class="hero-name">AXE</div>
+                <div class="hero-desc">Mogul Khan  Culling Blade</div>
+            </div>
+            <div class="hero-card">
+                <img class="hero-img" id="furion-img" src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/furion.png" alt="Furion">
+                <div class="hero-name">FURION</div>
+                <div class="hero-desc">Nature's Prophet  Teleportation</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PUBG TAB -->
+    <div id="pubg" class="tab-content">
+        <div class="game-title">DAMAGE RANKING</div>
+        <div class="ranking">
+            <div class="rank-card place1">
+                <div class="rank-medal">1</div>
+                <img class="rank-face" id="face-lekha" src="https://i.yapx.ru/dzdin.jpg">
+                <div class="rank-name">LEKHA</div>
+                <div class="rank-damage">22,000 DAMAGE</div>
+            </div>
+            <div class="rank-card place2">
+                <div class="rank-medal">2</div>
+                <img class="rank-face" id="face-azim" src="https://i.yapx.ru/dzdio.jpg">
+                <div class="rank-name">AZIM</div>
+                <div class="rank-damage">10,000 DAMAGE</div>
+            </div>
+            <div class="rank-card place3">
+                <div class="rank-medal">3</div>
+                <img class="rank-face" id="face-diman" src="https://i.yapx.ru/dzdik.jpg">
+                <div class="rank-name">DIMAN</div>
+                <div class="rank-damage">0 DAMAGE</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CS TAB -->
+    <div id="cs" class="tab-content">
+        <div class="game-title">LOW TAB</div>
+        <table class="cs-table">
+            <thead>
+                <tr>
+                    <th>PLAYER</th>
+                    <th>KILLS</th>
+                    <th>DEATHS</th>
+                    <th>ASSISTS</th>
+                    <th>K/D</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><img class="cs-face" id="face-zhenek" src="https://i.yapx.ru/dzZWib.jpg"> ZHENEK</td>
+                    <td class="negative">0</td>
+                    <td class="negative">18</td>
+                    <td>0</td>
+                    <td class="negative">0.00</td>
+                </tr>
+                <tr>
+                    <td><img class="cs-face" id="face-lekha_cs" src="https://i.yapx.ru/dzZNRb.jpg"> LEKHA</td>
+                    <td>15</td>
+                    <td>8</td>
+                    <td>4</td>
+                    <td>1.87</td>
+                </tr>
+                <tr>
+                    <td><img class="cs-face" id="face-azim_cs" src="https://via.placeholder.com/40?text=AZIM"> AZIM</td>
+                    <td>12</td>
+                    <td>10</td>
+                    <td>6</td>
+                    <td>1.20</td>
+                </tr>
+                <tr>
+                    <td><img class="cs-face" id="face-diman_cs" src="https://i.yapx.ru/dzZRdb.jpg"> DIMAN</td>
+                    <td>8</td>
+                    <td>12</td>
+                    <td>9</td>
+                    <td>0.66</td>
+                </tr>
+                <tr>
+                    <td><img class="cs-face" id="face-kiryuha_cs" src="https://i.yapx.ru/dzZUYb.jpg"> KIRYUHA</td>
+                    <td>10</td>
+                    <td>9</td>
+                    <td>7</td>
+                    <td>1.11</td>
+                </tr>
+                <tr>
+                    <td><img class="cs-face" id="face-rusik_cs" src="https://i.yapx.ru/dzZK7b.jpg"> RUSIK</td>
+                    <td>14</td>
+                    <td>7</td>
+                    <td>5</td>
+                    <td>2.00</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="footer">
+        DOTA: hover on hero -> your face | PUBG: damage ranking | CS: low tab
+    </div>
+</div>
+<script>
+    // ========== THREE DIFFERENT FACES FOR SF, AXE, FURION ==========
+    const sfFace = "https://i.yapx.ru/dzZNR.jpg";
+    const axeFace = "https://i.yapx.ru/dzdVC.jpg";
+    const furionFace = "https://i.yapx.ru/dzdVR.jpg";
+
+    const sfImg = document.getElementById('sf-img');
+    const axeImg = document.getElementById('axe-img');
+    const furionImg = document.getElementById('furion-img');
+
+    if (sfImg) {
+        sfImg.originalSrc = sfImg.src;
+        sfImg.addEventListener('mouseenter', () => { sfImg.src = sfFace; });
+        sfImg.addEventListener('mouseleave', () => { sfImg.src = sfImg.originalSrc; });
+    }
+    if (axeImg) {
+        axeImg.originalSrc = axeImg.src;
+        axeImg.addEventListener('mouseenter', () => { axeImg.src = axeFace; });
+        axeImg.addEventListener('mouseleave', () => { axeImg.src = axeImg.originalSrc; });
+    }
+    if (furionImg) {
+        furionImg.originalSrc = furionImg.src;
+        furionImg.addEventListener('mouseenter', () => { furionImg.src = furionFace; });
+        furionImg.addEventListener('mouseleave', () => { furionImg.src = furionImg.originalSrc; });
+    }
+
+    // ========== TABS SWITCHING ==========
+    const tabs = document.querySelectorAll('.tab-btn');
+    const contents = document.querySelectorAll('.tab-content');
+
+    tabs.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const tabId = btn.getAttribute('data-tab');
+            tabs.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            contents.forEach(c => c.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+        });
+    });
+</script>
+</body>
+</html>
